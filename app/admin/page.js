@@ -1,11 +1,20 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import SweetForm from '../components/SweetForm';
+import SweetsTable from '../components/SweetsTable';
 
 export default function AdminDashboard() {
     const [sweets, setSweets] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [formData, setFormData] = useState({ name: '', category: '', price: '', quantity: '', description: '' });
+    const [formData, setFormData] = useState({
+        name: '',
+        category: '',
+        price: '',
+        quantity: '',
+        description: '',
+        image: ''
+    });
     const [editingId, setEditingId] = useState(null);
     const [restockId, setRestockId] = useState(null);
     const [restockQty, setRestockQty] = useState('');
@@ -56,7 +65,7 @@ export default function AdminDashboard() {
             });
 
             if (res.ok) {
-                setFormData({ name: '', category: '', price: '', quantity: '', description: '' });
+                setFormData({ name: '', category: '', price: '', quantity: '', description: '', image: '' });
                 setEditingId(null);
                 fetchSweets();
             } else {
@@ -87,8 +96,14 @@ export default function AdminDashboard() {
             category: sweet.category,
             price: sweet.price,
             quantity: sweet.quantity,
-            description: sweet.description || ''
+            description: sweet.description || '',
+            image: sweet.image || ''
         });
+    };
+
+    const handleCancelEdit = () => {
+        setEditingId(null);
+        setFormData({ name: '', category: '', price: '', quantity: '', description: '', image: '' });
     };
 
     const handleRestock = async (e) => {
@@ -117,60 +132,22 @@ export default function AdminDashboard() {
         <div className="space-y-10">
             <h1 className="text-4xl font-bold text-pink-600 mb-8">Admin Dashboard</h1>
 
-            {/* Add/Edit Form */}
-            <div className="bg-white p-6 rounded-2xl shadow-lg border border-pink-100">
-                <h2 className="text-2xl font-bold mb-4 text-gray-800">{editingId ? 'Edit Sweet' : 'Add New Sweet'}</h2>
-                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input placeholder="Name" className="p-2 border rounded" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
-                    <input placeholder="Category" className="p-2 border rounded" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} required />
-                    <input type="number" placeholder="Price" className="p-2 border rounded" value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} required />
-                    <input type="number" placeholder="Quantity" className="p-2 border rounded" value={formData.quantity} onChange={e => setFormData({ ...formData, quantity: e.target.value })} required disabled={!!editingId} title="Use Restock to change qty" />
-                    <input placeholder="Description" className="p-2 border rounded md:col-span-2" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
+            <SweetForm
+                formData={formData}
+                setFormData={setFormData}
+                onSubmit={handleSubmit}
+                editingId={editingId}
+                onCancel={handleCancelEdit}
+            />
 
-                    <div className="md:col-span-2 flex gap-2">
-                        <button type="submit" className="bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600 transition flex-1 font-bold">
-                            {editingId ? 'Update Sweet' : 'Add Sweet'}
-                        </button>
-                        {editingId && (
-                            <button type="button" onClick={() => { setEditingId(null); setFormData({ name: '', category: '', price: '', quantity: '', description: '' }); }} className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
-                                Cancel
-                            </button>
-                        )}
-                    </div>
-                </form>
-            </div>
+            <SweetsTable
+                sweets={sweets}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onRestock={(id) => setRestockId(id)}
+            />
 
-            {/* Sweets List Table */}
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-pink-100">
-                <table className="w-full text-left">
-                    <thead className="bg-pink-50 text-pink-700">
-                        <tr>
-                            <th className="p-4">Name</th>
-                            <th className="p-4">Category</th>
-                            <th className="p-4">Price</th>
-                            <th className="p-4">Qty</th>
-                            <th className="p-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {sweets.map(sweet => (
-                            <tr key={sweet._id} className="border-b border-gray-100 hover:bg-pink-50 transition">
-                                <td className="p-4 font-semibold">{sweet.name}</td>
-                                <td className="p-4"><span className="bg-pink-100 text-pink-600 px-2 py-1 rounded-full text-xs uppercase font-bold">{sweet.category}</span></td>
-                                <td className="p-4">${sweet.price}</td>
-                                <td className="p-4 {sweet.quantity === 0 ? 'text-red-500 font-bold' : ''}">{sweet.quantity}</td>
-                                <td className="p-4 flex gap-2">
-                                    <button onClick={() => handleEdit(sweet)} className="text-blue-500 hover:text-blue-700 font-semibold text-sm">Edit</button>
-                                    <button onClick={() => handleDelete(sweet._id)} className="text-red-500 hover:text-red-700 font-semibold text-sm">Delete</button>
-                                    <button onClick={() => setRestockId(sweet._id)} className="text-green-500 hover:text-green-700 font-semibold text-sm">Restock</button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-
-            {/* Restock Modal (Simple Overlay) */}
+            {/* Restock Modal */}
             {restockId && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg w-80">

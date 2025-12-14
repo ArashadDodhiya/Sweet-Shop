@@ -7,10 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "jest"
+    "test": "jest",
+    "create-admin": "node scripts/createAdmin.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "dotenv": "^17.2.3",
     "jose": "^6.1.3",
     "mongoose": "^9.0.1",
     "next": "16.0.10",

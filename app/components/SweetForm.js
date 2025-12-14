@@ -14,13 +14,17 @@ export default function SweetForm({ formData, setFormData, onSubmit, editingId, 
                     onChange={e => setFormData({ ...formData, name: e.target.value })}
                     required
                 />
-                <input
-                    placeholder="Category"
-                    className="p-2 border rounded"
+                <select
+                    className="p-2 border rounded bg-white"
                     value={formData.category}
                     onChange={e => setFormData({ ...formData, category: e.target.value })}
                     required
-                />
+                >
+                    <option value="" disabled>Select Category</option>
+                    {['Ladoo', 'Barfi', 'Halwa', 'Syrup-based', 'Dry Fruit', 'Chocolates', 'Other'].map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                </select>
                 <input
                     type="number"
                     step="0.01"

@@ -4,6 +4,10 @@ A full-stack Sweet Shop Management System built with the **MERN** stack (MongoDB
 
 ## Features
 - **User Authentication**: Register and Login with JWT.
+
+## 🚀 Deployment
+**Live Demo:** [https://sweet-shop-ecru.vercel.app/](https://sweet-shop-ecru.vercel.app/)
+
 - **Browse Sweets**: Search and filter sweets by name or description.
 - **Purchase**: Buy sweets (requires login) and track realtime stock.
 - **Admin Dashboard**:
